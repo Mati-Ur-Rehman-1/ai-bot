@@ -76,6 +76,32 @@
       border: 1px solid rgba(0,0,0,0.1);
     }
 
+    .typing {
+      display: flex;
+      gap: 6px;
+      padding: 12px 18px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 20px;
+      align-self: flex-start;
+      border: 1px solid rgba(0,0,0,0.1);
+    }
+
+    .typing span {
+      display: block;
+      width: 8px;
+      height: 8px;
+      background: #555;
+      border-radius: 50%;
+      animation: blink 1.4s infinite;
+    }
+    .typing span:nth-child(2) { animation-delay: 0.2s; }
+    .typing span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes blink {
+      0%, 80%, 100% { opacity: 0; }
+      40% { opacity: 1; }
+    }
+
     .input-area {
       display: flex;
       padding: 15px;
@@ -162,6 +188,21 @@
   </div>
 
   <script>
+    function showTyping() {
+      const chatbox = document.getElementById("chatbox");
+      const typingDiv = document.createElement("div");
+      typingDiv.className = "typing bot";
+      typingDiv.id = "typing-indicator";
+      typingDiv.innerHTML = "<span></span><span></span><span></span>";
+      chatbox.appendChild(typingDiv);
+      chatbox.scrollTop = chatbox.scrollHeight;
+    }
+
+    function hideTyping() {
+      const typingDiv = document.getElementById("typing-indicator");
+      if (typingDiv) typingDiv.remove();
+    }
+
     async function sendMessage() {
       const input = document.getElementById("messageInput");
       const message = input.value.trim();
@@ -169,6 +210,8 @@
 
       addMessage("user", message);
       input.value = "";
+
+      showTyping(); // show dots
 
       try {
         const res = await fetch("/chat", {
@@ -178,8 +221,10 @@
         });
 
         const data = await res.json();
+        hideTyping(); // hide dots
         addMessage("bot", data.reply || "⚠️ No response");
       } catch (err) {
+        hideTyping();
         addMessage("bot", "❌ Error connecting to server");
       }
     }
@@ -198,6 +243,7 @@
       formData.append("lang", lang);
 
       addMessage("user", "📷 Uploaded an image, extracting & translating...");
+      showTyping();
 
       try {
         const res = await fetch("/ocr", {
@@ -206,9 +252,11 @@
         });
 
         const data = await res.json();
+        hideTyping();
         addMessage("bot", "📝 Original: " + (data.extractedText || "⚠️ No text found"));
         addMessage("bot", "🌍 Translated: " + (data.translatedText || "⚠️ Translation failed"));
       } catch (err) {
+        hideTyping();
         addMessage("bot", "❌ Error during OCR/translation");
       }
     }
