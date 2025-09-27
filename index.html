@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Chatbot</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .chat-container {
+      width: 100%;
+      max-width: 700px;
+      height: 85vh;
+      background: #fff;
+      border-radius: 20px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+      overflow: hidden;
+      animation: slideIn 0.5s ease-out;
+    }
+
+    .chat-header {
+      background: linear-gradient(90deg, #4f46e5, #6d28d9);
+      color: white;
+      padding: 18px;
+      text-align: center;
+      font-size: 1.4rem;
+      font-weight: bold;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    .chatbox {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background: #f9fafb;
+    }
+
+    .message {
+      max-width: 75%;
+      padding: 14px 18px;
+      border-radius: 20px;
+      line-height: 1.5;
+      word-wrap: break-word;
+      animation: fadeIn 0.3s ease-in-out;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .user {
+      background: linear-gradient(135deg, #4f46e5, #4338ca);
+      color: white;
+      align-self: flex-end;
+      border-bottom-right-radius: 6px;
+    }
+
+    .bot {
+      background: #ffffff;
+      color: #111827;
+      align-self: flex-start;
+      border-bottom-left-radius: 6px;
+      border: 1px solid #e5e7eb;
+    }
+
+    .input-area {
+      display: flex;
+      padding: 15px;
+      background: #f3f4f6;
+      border-top: 1px solid #ddd;
+    }
+
+    #messageInput {
+      flex: 1;
+      padding: 14px 16px;
+      border: 1px solid #ccc;
+      border-radius: 25px;
+      outline: none;
+      font-size: 1rem;
+      transition: border 0.2s, box-shadow 0.2s;
+    }
+
+    #messageInput:focus {
+      border: 1px solid #4f46e5;
+      box-shadow: 0 0 6px rgba(79,70,229,0.4);
+    }
+
+    button {
+      margin-left: 12px;
+      padding: 12px 24px;
+      background: linear-gradient(135deg, #4f46e5, #6d28d9);
+      border: none;
+      color: white;
+      font-size: 1rem;
+      border-radius: 25px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: transform 0.2s, opacity 0.2s;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+      opacity: 0.9;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideIn {
+      from { transform: translateY(40px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <div class="chat-header">🤖 AI Chatbot 🤖</div>
+    <div class="chatbox" id="chatbox"></div>
+    <div class="input-area">
+      <input type="text" id="messageInput" placeholder="Type your message..." onkeypress="if(event.key==='Enter'){sendMessage()}" />
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+  <script>
+    async function sendMessage() {
+      const input = document.getElementById("messageInput");
+      const message = input.value.trim();
+      if (!message) return;
+
+      addMessage("user", message);
+      input.value = "";
+
+      try {
+        const res = await fetch("/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message })
+        });
+
+        const data = await res.json();
+        addMessage("bot", data.reply || "⚠️ No response");
+      } catch (err) {
+        addMessage("bot", "❌ Error connecting to server");
+      }
+    }
+
+    function addMessage(role, text) {
+      const chatbox = document.getElementById("chatbox");
+      const div = document.createElement("div");
+      div.className = "message " + role;
+      div.innerText = text;
+      chatbox.appendChild(div);
+      chatbox.scrollTop = chatbox.scrollHeight;
+    }
+  </script>
+</body>
+</html>
