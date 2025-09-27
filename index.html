@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AI Chatbot</title>
+  <title>AI Chatbot + OCR</title>
   <style>
     body {
       margin: 0;
-      font-family: "Segoe UI", Tahoma, sans-serif;
-      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(135deg, #667eea, #764ba2);
       height: 100vh;
       display: flex;
       justify-content: center;
@@ -17,26 +17,28 @@
 
     .chat-container {
       width: 100%;
-      max-width: 700px;
-      height: 85vh;
-      background: #fff;
+      max-width: 750px;
+      height: 92vh;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(12px);
       border-radius: 20px;
       display: flex;
       flex-direction: column;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.25);
       overflow: hidden;
-      animation: slideIn 0.5s ease-out;
+      border: 1px solid rgba(255,255,255,0.3);
+      animation: slideIn 0.6s ease-out;
     }
 
     .chat-header {
       background: linear-gradient(90deg, #4f46e5, #6d28d9);
       color: white;
-      padding: 18px;
+      padding: 20px;
       text-align: center;
-      font-size: 1.4rem;
+      font-size: 1.5rem;
       font-weight: bold;
       letter-spacing: 1px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     }
 
     .chatbox {
@@ -45,8 +47,8 @@
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      background: #f9fafb;
+      gap: 14px;
+      background: rgba(255, 255, 255, 0.2);
     }
 
     .message {
@@ -56,7 +58,7 @@
       line-height: 1.5;
       word-wrap: break-word;
       animation: fadeIn 0.3s ease-in-out;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      box-shadow: 0 3px 6px rgba(0,0,0,0.15);
     }
 
     .user {
@@ -67,18 +69,21 @@
     }
 
     .bot {
-      background: #ffffff;
+      background: rgba(255, 255, 255, 0.9);
       color: #111827;
       align-self: flex-start;
       border-bottom-left-radius: 6px;
-      border: 1px solid #e5e7eb;
+      border: 1px solid rgba(0,0,0,0.1);
     }
 
     .input-area {
       display: flex;
       padding: 15px;
-      background: #f3f4f6;
-      border-top: 1px solid #ddd;
+      background: rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(8px);
+      border-top: 1px solid rgba(255,255,255,0.4);
+      gap: 10px;
+      flex-wrap: wrap;
     }
 
     #messageInput {
@@ -93,12 +98,11 @@
 
     #messageInput:focus {
       border: 1px solid #4f46e5;
-      box-shadow: 0 0 6px rgba(79,70,229,0.4);
+      box-shadow: 0 0 8px rgba(79,70,229,0.5);
     }
 
     button {
-      margin-left: 12px;
-      padding: 12px 24px;
+      padding: 12px 20px;
       background: linear-gradient(135deg, #4f46e5, #6d28d9);
       border: none;
       color: white;
@@ -110,12 +114,19 @@
     }
 
     button:hover {
-      transform: scale(1.05);
+      transform: scale(1.07);
       opacity: 0.9;
     }
 
+    select, input[type="file"] {
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px solid #ccc;
+      background: rgba(255,255,255,0.8);
+    }
+
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px); }
+      from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
@@ -127,11 +138,26 @@
 </head>
 <body>
   <div class="chat-container">
-    <div class="chat-header">🤖 AI Chatbot 🤖</div>
+    <div class="chat-header">🤖 AI Chatbot + OCR 🤖</div>
     <div class="chatbox" id="chatbox"></div>
+
+    <!-- Chat input -->
     <div class="input-area">
-      <input type="text" id="messageInput" placeholder="Type your message..." onkeypress="if(event.key==='Enter'){sendMessage()}" />
+      <input type="text" id="messageInput" placeholder="Type your message..." 
+             onkeypress="if(event.key==='Enter'){sendMessage()}" />
       <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <!-- OCR upload input -->
+    <div class="input-area">
+      <input type="file" id="imageInput" />
+      <select id="langSelect">
+        <option value="en">English</option>
+        <option value="ur">Urdu</option>
+        <option value="de">German</option>
+        <option value="fr">French</option>
+      </select>
+      <button onclick="uploadImage()">Translate Image</button>
     </div>
   </div>
 
@@ -155,6 +181,35 @@
         addMessage("bot", data.reply || "⚠️ No response");
       } catch (err) {
         addMessage("bot", "❌ Error connecting to server");
+      }
+    }
+
+    async function uploadImage() {
+      const fileInput = document.getElementById("imageInput");
+      const lang = document.getElementById("langSelect").value;
+
+      if (!fileInput.files.length) {
+        addMessage("bot", "⚠️ Please upload an image first!");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("image", fileInput.files[0]);
+      formData.append("lang", lang);
+
+      addMessage("user", "📷 Uploaded an image, extracting & translating...");
+
+      try {
+        const res = await fetch("/ocr", {
+          method: "POST",
+          body: formData
+        });
+
+        const data = await res.json();
+        addMessage("bot", "📝 Original: " + (data.extractedText || "⚠️ No text found"));
+        addMessage("bot", "🌍 Translated: " + (data.translatedText || "⚠️ Translation failed"));
+      } catch (err) {
+        addMessage("bot", "❌ Error during OCR/translation");
       }
     }
 
