@@ -4,7 +4,11 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   },
   "dependencies": {
     "body-parser": "^2.2.0",
@@ -13,5 +17,9 @@
     "express": "^5.1.0",
     "express-fileupload": "^1.5.2",
     "node-fetch": "^3.3.2"
-  }
+  },
+  "description": "",
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }
