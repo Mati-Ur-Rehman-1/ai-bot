@@ -8,11 +8,10 @@ on:
     branches:
       - main
     paths-ignore:
-      - '**.md'      # This ignores all markdown files
-      - 'docs/**'    # This ignores the docs folder
-      - 'README.md'  # This ignores the specific readme file
+      - '**.md'      # This makes it ignore all markdown files
+      - 'docs/**'    # This makes it ignore the docs folder
+      - 'README.md'  # This makes it ignore the specific readme file
   workflow_dispatch:
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -58,3 +57,4 @@ jobs:
           package: .
 
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_87FA74F39A3D4F7F954F4F06E11B017C }}
+
