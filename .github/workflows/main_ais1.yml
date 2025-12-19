@@ -7,6 +7,10 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - '**.md'      
+      - 'docs/**'   
+      - 'README.md'  
   workflow_dispatch:
 
 jobs:
@@ -52,4 +56,5 @@ jobs:
           app-name: 'ais1'
           slot-name: 'Production'
           package: .
+
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_8F99A856B7FE400CB3967199F4F7D80C }}
