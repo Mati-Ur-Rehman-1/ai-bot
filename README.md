@@ -33,3 +33,11 @@ The frontend is built with HTML/CSS/JS, and the backend interacts with AI models
 - **Frontend:** HTML, CSS, JavaScript  
 - **AI Models:** Azure OpenAI API (ChatGPT, DALL·E, OCR/Translation)  
 - **Hosting/Deployment:** Azure Web App Service  
+
+
+**Note:** This AI Bot is currently *not functional*. 
+ 
+ * *Cloud Resources:* The Azure Web App service and associated resources have been decommissioned.
+ * *API Keys:* All sensitive credentials and API keys have been revoked and removed from the project.
+ 
+ This repository remains public for *portfolio and documentation purposes only* to demonstrate the codebase and logic.
